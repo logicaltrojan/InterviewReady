@@ -5,12 +5,44 @@
 using namespace std;
 int d[100000];
 
-
-
 void swap(int* a, int* b){
   int temp = *a;
   *a = *b;
   *b = temp;
+}
+
+int pow(int x, int r){
+
+  int re = x;
+  for(int i = 1; i < r; i++) re *= re;
+
+  return re;
+}
+int getPivot(int a[], int l, int r){
+
+  int pv = a[r];
+  int wall = l-1;
+
+  for(int i = l; i < r; i++){
+    if(a[i] < pv){
+      swap(&a[++wall],&a[i]);
+    }
+  }
+
+  swap(&a[++wall], &a[r]);
+
+  return wall;
+
+}
+
+void quickSort(int a[], int l, int r){
+
+  if(l < r){
+    int pv = getPivot(a, l, r);
+    quickSort(a, l, pv-1);
+    quickSort(a, pv+1, r);
+
+  }
 }
 
 void selectionSort(int* array, int size){
@@ -74,8 +106,6 @@ void bubbleSort(int a[], int size){
 
 }
 
-
-
 void merge(int a[], int left, int middle, int right){
 
 
@@ -127,8 +157,6 @@ void merge(int a[], int left, int middle, int right){
   return;
 }
 
-
-
 void mergeSort(int a[], int l, int r){
 
   if(l<r){
@@ -142,10 +170,77 @@ void mergeSort(int a[], int l, int r){
 
 }
 
+void countingSort(int a[], int size, int arrange){
+
+  int* count_array = (int*)malloc(sizeof(int)*arrange);
+  int* return_array = (int*)malloc(sizeof(int)*(size+1));
+  for(int i = 0; i < arrange; i++){
+    count_array[i] = 0;
+  }
+
+  for(int i = 0; i < size; i++){
+    count_array[a[i]]++;
+  }
+
+  int sum = count_array[0];
+  for(int i = 1; i < arrange; i++){
+    sum += count_array[i];
+    count_array[i] = sum;
+
+  }
+
+  for(int i = 0; i < size ; i++){
+    return_array[--count_array[a[i]]] = a[i];
+  }
+
+  for(int i = 0; i < size; i++){
+    a[i] = return_array[i];
+  }
+
+
+}
+
+void countSortForRadixSort(int a[], int size, int exp){
+
+  int* count_array = (int*)malloc(sizeof(int)*11);
+  int* return_array = (int*)malloc(sizeof(int)*(size+1));
+
+  for(int i = 0; i < 11; i++){
+    count_array[i] = 0;
+  }
+
+  for(int i = 0; i < size; i++){
+    count_array[(a[i]/exp)%10]++;
+  }
+
+  int sum = count_array[0];
+
+  for(int i = 1; i < 11; i++){
+    sum += count_array[i];
+    count_array[i] = sum;
+  }
+
+  for(int i = 0; i < size ; i++){
+    return_array[--count_array[(a[i]/exp)%10]] = a[i];
+  }
+
+  for(int i = 0; i < size; i++){
+    a[i] = return_array[i];
+  }
+
+}
+void radixSort(int a[], int size, int exp){
+
+  for(int i = 1; i <= exp; i++){
+    countSortForRadixSort(a, size, pow(10,i));
+  }
+}
+
 void printArray(int size){
   for(int i = 0; i < size; i++){
     printf("%d ", d[i]);
   }
+  printf("\n");
 }
 
 
@@ -156,9 +251,8 @@ int main(){
     d[i] = size- i;
   }
 
-  // printArray(size);
-
-  mergeSort(d, 0, size-1);
+  printArray(size);
+  radixSort(d, size, 3);
 
   printArray(size);
 
